@@ -1530,10 +1530,11 @@ def buscar_sessao():
 
     cur = con.cursor()
 
-    # Ajuste para comparar data ignorando a hora
+    # Ajuste para comparar data ignorando a hora e incluir o título do filme
     cur.execute("""
-        SELECT s.id_sessao, s.id_sala, s.id_cadastrof, s.datasessao, s.status, s.valor_assento
+        SELECT s.id_sessao, s.id_sala, s.id_cadastrof, s.datasessao, s.status, s.valor_assento, c.titulo AS nome_filme
         FROM sessao s
+        JOIN cadastro_filme c ON s.id_cadastrof = c.id_cadastrof
         WHERE CAST(s.datasessao AS DATE) = ? AND s.status = 0
     """, (data_sessao_formatada,))
 
@@ -1549,7 +1550,8 @@ def buscar_sessao():
         'id_cadastrof': sessao[2],
         'data_sessao': sessao[3].strftime('%d/%m/%Y %H:%M'),
         'status': sessao[4],
-        'valor_assento': float(sessao[5])
+        'valor_assento': float(sessao[5]),
+        'nome_filme': sessao[6]  # Adiciona o título do filme
     } for sessao in sessoes]
 
     return jsonify({'mensagem': 'Sessões encontradas', 'sessoes': sessoes_lista})
